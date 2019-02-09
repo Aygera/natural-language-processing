@@ -51,10 +51,14 @@ def load_embeddings(embeddings_path):
     ########################
 
     # remove this when you're done
-    raise NotImplementedError(
-        "Open utils.py and fill with your code. In case of Google Colab, download"
-        "(https://github.com/hse-aml/natural-language-processing/blob/master/project/utils.py), "
-        "edit locally and upload using '> arrow on the left edge' -> Files -> UPLOAD")
+    wv_embeddings = KeyedVectors.load_word2vec_format("GoogleNews-vectors-negative300.bin.gz", binary=True) 
+    
+    new_dict = {}
+    for title in stackoverflow_df['title']:
+      for word in title.split():
+        if word in wv_embeddings:
+          new_dict[word] = wv_embeddings[word]
+    return new_dict, len(new_dict["word"])
 
 
 def question_to_vec(question, embeddings, dim):
@@ -66,11 +70,14 @@ def question_to_vec(question, embeddings, dim):
     #### YOUR CODE HERE ####
     ########################
 
-    # remove this when you're done
-    raise NotImplementedError(
-        "Open utils.py and fill with your code. In case of Google Colab, download"
-        "(https://github.com/hse-aml/natural-language-processing/blob/master/project/utils.py), "
-        "edit locally and upload using '> arrow on the left edge' -> Files -> UPLOAD")
+    question2vec = []
+    for word in question.split():
+      if word in embeddings:
+        question2vec.append(embeddings[ word])
+    if (len(question2vec) == 0):
+      return np.array(np.zeros(dim))
+    else:
+      return np.array(question2vec).mean(axis=0)
 
 
 def unpickle_file(filename):
