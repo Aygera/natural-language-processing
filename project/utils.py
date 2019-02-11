@@ -51,14 +51,18 @@ def load_embeddings(embeddings_path):
     ########################
 
     # remove this when you're done
-    wv_embeddings = KeyedVectors.load_word2vec_format("GoogleNews-vectors-negative300.bin.gz", binary=True) 
+    def read_corpus(filename):
+        data = []
+        for line in open(filename, encoding='utf-8'):
+            data.append(line.strip().split('\t'))
+        return data   
     
-    new_dict = {}
-    for title in stackoverflow_df['title']:
-      for word in title.split():
-        if word in wv_embeddings:
-          new_dict[word] = wv_embeddings[word]
-    return new_dict, len(new_dict["word"])
+    emb_list = [(v[0], [float(n) for n in v[1:]]) for v in read_corpus(embeddings_path)]
+    
+    embeddings = dict(emb_list)
+    embeddings_dim = len(emb_list[0][1])
+    
+    return embeddings, embeddings_dim
 
 
 def question_to_vec(question, embeddings, dim):
